@@ -13,7 +13,7 @@ func TestBreakout(t *testing.T) {
 		p: problem{a: 0, b: 0, op: plus},
 	}, {
 		p:  problem{a: 3, b: 3, op: plus},
-		a1: 3,
+		a2: 3,
 		b1: 3,
 	}, {
 		p:  problem{a: 10, b: 10, op: plus},

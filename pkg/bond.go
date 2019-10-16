@@ -54,9 +54,9 @@ func NewProblem() (p problem) {
 func (p problem) Breakout() (a1, a2, b1, b2 int) {
 	if p.op == plus {
 		switch {
-		case p.a <= 10:
-			a1 = p.a
-			a2 = 0
+		case p.a < 10:
+			a2 = p.a
+			a1 = 0
 		default:
 			a1 = 10
 			a2 = p.a - 10
