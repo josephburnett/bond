@@ -7,47 +7,47 @@ import (
 
 func TestBreakout(t *testing.T) {
 	cases := []struct {
-		p              problem
+		p              Problem
 		a1, a2, b1, b2 int
 	}{{
-		p: problem{a: 0, b: 0, op: plus},
+		p: Problem{a: 0, b: 0, op: plus},
 	}, {
-		p:  problem{a: 3, b: 3, op: plus},
+		p:  Problem{a: 3, b: 3, op: plus},
 		a2: 3,
 		b1: 3,
 	}, {
-		p:  problem{a: 10, b: 10, op: plus},
+		p:  Problem{a: 10, b: 10, op: plus},
 		a1: 10,
 		b1: 10,
 	}, {
-		p:  problem{a: 11, b: 9, op: plus},
+		p:  Problem{a: 11, b: 9, op: plus},
 		a1: 10,
 		a2: 1,
 		b1: 9,
 	}, {
-		p:  problem{a: 11, b: 10, op: plus},
+		p:  Problem{a: 11, b: 10, op: plus},
 		a1: 10,
 		a2: 1,
 		b1: 9,
 		b2: 1,
 	}, {
-		p:  problem{a: 0, b: 1, op: plus},
+		p:  Problem{a: 0, b: 1, op: plus},
 		b1: 1,
 	}, {
-		p:  problem{a: 10, b: 10, op: minus},
+		p:  Problem{a: 10, b: 10, op: minus},
 		a2: 10,
 		b1: 10,
 	}, {
-		p:  problem{a: 5, b: 5, op: minus},
+		p:  Problem{a: 5, b: 5, op: minus},
 		a2: 5,
 		b1: 5,
 	}, {
-		p:  problem{a: 10, b: 5, op: minus},
+		p:  Problem{a: 10, b: 5, op: minus},
 		a1: 5,
 		a2: 5,
 		b1: 5,
 	}, {
-		p:  problem{a: 12, b: 2, op: minus},
+		p:  Problem{a: 12, b: 2, op: minus},
 		a1: 10,
 		a2: 2,
 		b1: 2,

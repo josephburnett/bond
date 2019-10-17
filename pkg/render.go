@@ -7,20 +7,22 @@ import (
 )
 
 type HtmlView struct {
-	p   problem
-	doc js.Value
-	svg js.Value
+	p    Problem
+	doc  js.Value
+	svg  js.Value
+	done func()
 }
 
-func NewHtmlView(p problem) *HtmlView {
+func NewHtmlView(p Problem, done func()) *HtmlView {
 	doc := js.Global().Get("document")
 	svg := doc.Call("getElementById", "bond")
 	svg.Call("setAttribute", "viewBox", "0 0 50 20")
 	svg.Set("innerHTML", "")
 	return &HtmlView{
-		p:   p,
-		doc: doc,
-		svg: svg,
+		p:    p,
+		doc:  doc,
+		svg:  svg,
+		done: done,
 	}
 }
 
@@ -90,9 +92,22 @@ func (v *HtmlView) Render() {
 
 	// Choices
 	for i, c := range v.p.cs {
-		v.circle("white", 37, 6*i+4, 2)
+		answer := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			fmt.Println("Correct!")
+			v.answer(c)
+			return nil
+		})
+		r := v.circle("white", 37, 6*i+4, 2)
+		r.Set("onclick", answer)
 		t := v.text(36, 6*i+5, strconv.Itoa(c), 2)
 		t.Call("setAttribute", "id", fmt.Sprintf("answer-%v", i))
+		t.Set("onclick", answer)
+	}
+}
+
+func (v *HtmlView) answer(c int) {
+	if c == v.p.c {
+		v.done()
 	}
 }
 

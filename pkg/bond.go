@@ -16,13 +16,13 @@ const (
 	minus operator = "minus"
 )
 
-type problem struct {
+type Problem struct {
 	a, b, c int
 	op      operator
 	cs      []int
 }
 
-func NewProblem() (p problem) {
+func NewProblem() (p Problem) {
 	if rand.Intn(2) == 0 {
 		p.op = plus
 		p.a = rand.Intn(maxSum) + 1     // 1..20
@@ -51,7 +51,7 @@ func NewProblem() (p problem) {
 	return
 }
 
-func (p problem) Breakout() (a1, a2, b1, b2 int) {
+func (p Problem) Breakout() (a1, a2, b1, b2 int) {
 	if p.op == plus {
 		switch {
 		case p.a < 10:
