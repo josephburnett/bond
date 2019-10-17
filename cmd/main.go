@@ -15,13 +15,15 @@ func main() {
 	eventHandler := func(e bond.Event) {
 		switch e {
 		case bond.CORRECT:
-			fmt.Println("Correct.")
 			s.Correct()
 			v.SetProblem(bond.NewProblem())
+			v.SetHint(false)
 			v.Render()
 		case bond.INCORRECT:
-			fmt.Println("Incorrect.")
 			s.Incorrect()
+			v.Render()
+		case bond.HINT:
+			v.SetHint(true)
 			v.Render()
 		default:
 			fmt.Printf("Unhandled event: %v\n", e)

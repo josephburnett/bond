@@ -21,6 +21,7 @@ type HtmlView struct {
 	svg       js.Value
 	event     func(Event)
 	toRelease []js.Func
+	hint      bool
 }
 
 func NewHtmlView(event func(Event)) *HtmlView {
@@ -44,6 +45,10 @@ func (v *HtmlView) SetScore(s *Score) {
 	v.s = s
 }
 
+func (v *HtmlView) SetHint(h bool) {
+	v.hint = h
+}
+
 func (v *HtmlView) Render() {
 
 	v.svg.Set("innerHTML", "")
@@ -63,48 +68,57 @@ func (v *HtmlView) Render() {
 		v.line(15, 7, 15, 3)
 	}
 
-	a1, a2, b1, b2 := v.p.Breakout()
+	if !v.hint {
+		h := v.text(14, 18, "?", 5)
+		h.Set("onclick", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			v.event(HINT)
+			return nil
+		}))
 
-	// First number, part one
-	if a1 != 0 {
-		v.circle("#afa", 4, 12, 2)
-		v.line(4, 10, 6, 8)
-		v.text(3, 13, strconv.Itoa(a1), 2)
-		v.numberLine("#afa", 2, 16, a1, 0)
-	}
+	} else {
+		a1, a2, b1, b2 := v.p.Breakout()
 
-	// First number, part two
-	if a2 != 0 {
-		advance := 0
-		if v.p.op == minus {
-			advance = a1
+		// First number, part one
+		if a1 != 0 {
+			v.circle("#afa", 4, 12, 2)
+			v.line(4, 10, 6, 8)
+			v.text(3, 13, strconv.Itoa(a1), 2)
+			v.numberLine("#afa", 2, 16, a1, 0)
 		}
-		v.circle("#faa", 10, 12, 2)
-		v.line(10, 10, 8, 8)
-		v.text(9, 13, strconv.Itoa(a2), 2)
-		v.numberLine("#faa", 8, 16, a2, advance)
-	}
 
-	// Second number, part one
-	if b1 != 0 {
-		advance := 0
-		if v.p.op == plus {
-			advance = a2
-		} else {
-			advance = a1
+		// First number, part two
+		if a2 != 0 {
+			advance := 0
+			if v.p.op == minus {
+				advance = a1
+			}
+			v.circle("#faa", 10, 12, 2)
+			v.line(10, 10, 8, 8)
+			v.text(9, 13, strconv.Itoa(a2), 2)
+			v.numberLine("#faa", 8, 16, a2, advance)
 		}
-		v.circle("#faa", 20, 12, 2)
-		v.line(20, 10, 22, 8)
-		v.text(19, 13, strconv.Itoa(b1), 2)
-		v.numberLine("#faa", 18, 16, b1, advance)
-	}
 
-	// Second number, part two
-	if b2 != 0 {
-		v.circle("#aaf", 26, 12, 2)
-		v.line(26, 10, 24, 8)
-		v.text(25, 13, strconv.Itoa(b2), 2)
-		v.numberLine("#aaf", 24, 16, b2, 0)
+		// Second number, part one
+		if b1 != 0 {
+			advance := 0
+			if v.p.op == plus {
+				advance = a2
+			} else {
+				advance = a1
+			}
+			v.circle("#faa", 20, 12, 2)
+			v.line(20, 10, 22, 8)
+			v.text(19, 13, strconv.Itoa(b1), 2)
+			v.numberLine("#faa", 18, 16, b1, advance)
+		}
+
+		// Second number, part two
+		if b2 != 0 {
+			v.circle("#aaf", 26, 12, 2)
+			v.line(26, 10, 24, 8)
+			v.text(25, 13, strconv.Itoa(b2), 2)
+			v.numberLine("#aaf", 24, 16, b2, 0)
+		}
 	}
 
 	// Equals
