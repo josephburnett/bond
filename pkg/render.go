@@ -7,10 +7,11 @@ import (
 )
 
 type HtmlView struct {
-	p    Problem
-	doc  js.Value
-	svg  js.Value
-	done func()
+	p         Problem
+	doc       js.Value
+	svg       js.Value
+	done      func()
+	toRelease []js.Func
 }
 
 func NewHtmlView(p Problem, done func()) *HtmlView {
@@ -19,10 +20,11 @@ func NewHtmlView(p Problem, done func()) *HtmlView {
 	svg.Call("setAttribute", "viewBox", "0 0 50 20")
 	svg.Set("innerHTML", "")
 	return &HtmlView{
-		p:    p,
-		doc:  doc,
-		svg:  svg,
-		done: done,
+		p:         p,
+		doc:       doc,
+		svg:       svg,
+		done:      done,
+		toRelease: make([]js.Func, 0),
 	}
 }
 
@@ -97,6 +99,7 @@ func (v *HtmlView) Render() {
 			v.answer(a)
 			return nil
 		})
+		v.toRelease = append(v.toRelease, answer)
 		r := v.circle("white", 37, 6*i+4, 2)
 		r.Set("onclick", answer)
 		t := v.text(36, 6*i+5, strconv.Itoa(c), 2)
@@ -108,6 +111,9 @@ func (v *HtmlView) Render() {
 func (v *HtmlView) answer(c int) {
 	if c == v.p.c {
 		v.done()
+		for _, fn := range v.toRelease {
+			fn.Release()
+		}
 	}
 }
 
