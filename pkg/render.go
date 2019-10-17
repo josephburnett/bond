@@ -6,30 +6,44 @@ import (
 	"syscall/js"
 )
 
+type Event string
+
+const (
+	CORRECT   Event = "correct"
+	INCORRECT Event = "incorrect"
+	HINT      Event = "hint"
+)
+
 type HtmlView struct {
 	p         Problem
+	score     Score
 	doc       js.Value
 	svg       js.Value
-	done      func()
-	locked    bool
+	event     func(Event)
 	toRelease []js.Func
 }
 
-func NewHtmlView(p Problem, done func()) *HtmlView {
+func NewHtmlView(event func(Event)) *HtmlView {
 	doc := js.Global().Get("document")
 	svg := doc.Call("getElementById", "bond")
-	svg.Call("setAttribute", "viewBox", "0 0 50 20")
+	svg.Call("setAttribute", "viewBox", "0 0 50 25")
 	svg.Set("innerHTML", "")
 	return &HtmlView{
-		p:         p,
 		doc:       doc,
 		svg:       svg,
-		done:      done,
+		event:     event,
 		toRelease: make([]js.Func, 0),
 	}
 }
 
+func (v *HtmlView) SetProblem(p Problem) {
+	v.p = p
+}
+
 func (v *HtmlView) Render() {
+
+	v.svg.Set("innerHTML", "")
+	v.release()
 
 	// First number
 	v.circle("white", 7, 5, 3)
@@ -109,13 +123,18 @@ func (v *HtmlView) Render() {
 	}
 }
 
+func (v *HtmlView) release() {
+	for _, fn := range v.toRelease {
+		fn.Release()
+	}
+	v.toRelease = make([]js.Func, 0)
+}
+
 func (v *HtmlView) answer(c int) {
-	if c == v.p.c && !v.locked {
-		v.locked = true
-		v.done()
-		for _, fn := range v.toRelease {
-			fn.Release()
-		}
+	if c == v.p.c {
+		v.event(CORRECT)
+	} else {
+		v.event(INCORRECT)
 	}
 }
 

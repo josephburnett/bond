@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -9,14 +10,24 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
-	var next func()
-	var p bond.Problem
 	var v *bond.HtmlView
-	next = func() {
-		p = bond.NewProblem()
-		v = bond.NewHtmlView(p, next)
-		v.Render()
+	eventHandler := func(e bond.Event) {
+		switch e {
+		case bond.CORRECT:
+			fmt.Println("Correct.")
+			p := bond.NewProblem()
+			v.SetProblem(p)
+			v.Render()
+		case bond.INCORRECT:
+			fmt.Println("Incorrect.")
+		default:
+			fmt.Printf("Unhandled event: %v\n", e)
+		}
+
 	}
-	next()
+	v = bond.NewHtmlView(eventHandler)
+	p := bond.NewProblem()
+	v.SetProblem(p)
+	v.Render()
 	select {}
 }
