@@ -16,7 +16,7 @@ const (
 
 type HtmlView struct {
 	p         Problem
-	score     Score
+	s         *Score
 	doc       js.Value
 	svg       js.Value
 	event     func(Event)
@@ -26,7 +26,7 @@ type HtmlView struct {
 func NewHtmlView(event func(Event)) *HtmlView {
 	doc := js.Global().Get("document")
 	svg := doc.Call("getElementById", "bond")
-	svg.Call("setAttribute", "viewBox", "0 0 50 25")
+	svg.Call("setAttribute", "viewBox", "0 0 53 25")
 	svg.Set("innerHTML", "")
 	return &HtmlView{
 		doc:       doc,
@@ -38,6 +38,10 @@ func NewHtmlView(event func(Event)) *HtmlView {
 
 func (v *HtmlView) SetProblem(p Problem) {
 	v.p = p
+}
+
+func (v *HtmlView) SetScore(s *Score) {
+	v.s = s
 }
 
 func (v *HtmlView) Render() {
@@ -121,6 +125,10 @@ func (v *HtmlView) Render() {
 		t.Call("setAttribute", "id", fmt.Sprintf("answer-%v", i))
 		t.Set("onclick", answer)
 	}
+
+	// Score
+	v.text(43, 4, fmt.Sprintf("%v/%v", v.s.current, v.s.goal), 2)
+	v.text(43, 7, fmt.Sprintf("Wins: %v", v.s.wins), 2)
 }
 
 func (v *HtmlView) release() {
