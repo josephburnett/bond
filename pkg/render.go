@@ -92,9 +92,9 @@ func (v *HtmlView) Render() {
 
 	// Choices
 	for i, c := range v.p.cs {
+		a := c
 		answer := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			fmt.Println("Correct!")
-			v.answer(c)
+			v.answer(a)
 			return nil
 		})
 		r := v.circle("white", 37, 6*i+4, 2)

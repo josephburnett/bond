@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 
@@ -9,7 +8,6 @@ import (
 )
 
 func main() {
-	fmt.Println("It's alive!")
 	rand.Seed(time.Now().UTC().UnixNano())
 	var next func()
 	var p bond.Problem
