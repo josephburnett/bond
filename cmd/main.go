@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
+	fmt.Println("It's alive!")
 	rand.Seed(time.Now().UTC().UnixNano())
 	p := bond.NewProblem()
-	fmt.Printf("%+v\n", p)
-	a1, a2, b1, b2 := p.Breakout()
-	fmt.Printf("%v %v %v %v\n", a1, a2, b1, b2)
+	v := bond.NewHtmlView(p)
+	v.Render()
 }

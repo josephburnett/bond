@@ -1,0 +1,27 @@
+<!doctype html>
+<!--
+Copyright 2018 The Go Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<html>
+
+<head>
+  <meta charset="utf-8"/>
+  <script src="wasm_exec.js"></script>
+  <script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("bond.wasm"), go.importObject).then((result) => {
+	go.run(result.instance);
+    });
+  </script>
+</head>
+
+<body>
+  <div>
+    <svg id="bond" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+    </svg>
+  </div>
+</body>
+
+</html>
