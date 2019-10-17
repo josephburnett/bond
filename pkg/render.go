@@ -46,20 +46,33 @@ func (v *HtmlView) Render() {
 		v.circle("#afa", 4, 17, 2)
 		v.line(4, 15, 6, 13)
 		v.text(3, 18, strconv.Itoa(a1), 2)
+		v.numberLine("#afa", 2, 21, a1, 0)
 	}
 
 	// First number, part two
 	if a2 != 0 {
+		advance := 0
+		if v.p.op == minus {
+			advance = a1
+		}
 		v.circle("#faa", 10, 17, 2)
 		v.line(10, 15, 8, 13)
 		v.text(9, 18, strconv.Itoa(a2), 2)
+		v.numberLine("#faa", 8, 21, a2, advance)
 	}
 
 	// Second number, part one
 	if b1 != 0 {
+		advance := 0
+		if v.p.op == plus {
+			advance = a2
+		} else {
+			advance = a1
+		}
 		v.circle("#faa", 20, 17, 2)
 		v.line(20, 15, 22, 13)
 		v.text(19, 18, strconv.Itoa(b1), 2)
+		v.numberLine("#faa", 18, 21, b1, advance)
 	}
 
 	// Second number, part two
@@ -67,6 +80,7 @@ func (v *HtmlView) Render() {
 		v.circle("#aaf", 26, 17, 2)
 		v.line(26, 15, 24, 13)
 		v.text(25, 18, strconv.Itoa(b2), 2)
+		v.numberLine("#aaf", 24, 21, b2, 0)
 	}
 }
 
@@ -96,4 +110,30 @@ func (v *HtmlView) line(x1, y1, x2, y2 int) {
 	l.Call("setAttribute", "y2", y2)
 	l.Call("setAttribute", "style", "stroke: black; stroke-width: 0.25")
 	v.svg.Call("appendChild", l)
+}
+
+func (v *HtmlView) numberLine(color string, x, y, count, skip int) {
+	row, col := 0, 0
+	advance := func() {
+		col += 1
+		if col == 5 {
+			col = 0
+			row += 1
+		}
+	}
+	for i := 0; i < skip; i++ {
+		advance()
+	}
+	for count != 0 {
+		r := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "rect")
+		r.Call("setAttribute", "x", x+col)
+		r.Call("setAttribute", "y", y+row)
+		r.Call("setAttribute", "height", 1)
+		r.Call("setAttribute", "width", 1)
+		r.Call("setAttribute", "fill", color)
+		r.Call("setAttribute", "style", "stroke: black; stroke-width: 0.25")
+		v.svg.Call("appendChild", r)
+		count -= 1
+		advance()
+	}
 }
