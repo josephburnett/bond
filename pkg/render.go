@@ -15,6 +15,7 @@ type HtmlView struct {
 func NewHtmlView(p problem) *HtmlView {
 	doc := js.Global().Get("document")
 	svg := doc.Call("getElementById", "bond")
+	svg.Call("setAttribute", "viewBox", "0 0 50 20")
 	svg.Set("innerHTML", "")
 	return &HtmlView{
 		p:   p,
@@ -26,27 +27,27 @@ func NewHtmlView(p problem) *HtmlView {
 func (v *HtmlView) Render() {
 
 	// First number
-	v.circle("white", 7, 10, 3)
-	v.text(5, 11, strconv.Itoa(v.p.a), 3)
+	v.circle("white", 7, 5, 3)
+	v.text(5, 6, strconv.Itoa(v.p.a), 3)
 
 	// Second number
-	v.circle("white", 23, 10, 3)
-	v.text(21, 11, strconv.Itoa(v.p.b), 3)
+	v.circle("white", 23, 5, 3)
+	v.text(21, 6, strconv.Itoa(v.p.b), 3)
 
 	// Operator
-	v.line(13, 10, 17, 10)
+	v.line(13, 5, 17, 5)
 	if v.p.op == plus {
-		v.line(15, 12, 15, 8)
+		v.line(15, 7, 15, 3)
 	}
 
 	a1, a2, b1, b2 := v.p.Breakout()
 
 	// First number, part one
 	if a1 != 0 {
-		v.circle("#afa", 4, 17, 2)
-		v.line(4, 15, 6, 13)
-		v.text(3, 18, strconv.Itoa(a1), 2)
-		v.numberLine("#afa", 2, 21, a1, 0)
+		v.circle("#afa", 4, 12, 2)
+		v.line(4, 10, 6, 8)
+		v.text(3, 13, strconv.Itoa(a1), 2)
+		v.numberLine("#afa", 2, 16, a1, 0)
 	}
 
 	// First number, part two
@@ -55,10 +56,10 @@ func (v *HtmlView) Render() {
 		if v.p.op == minus {
 			advance = a1
 		}
-		v.circle("#faa", 10, 17, 2)
-		v.line(10, 15, 8, 13)
-		v.text(9, 18, strconv.Itoa(a2), 2)
-		v.numberLine("#faa", 8, 21, a2, advance)
+		v.circle("#faa", 10, 12, 2)
+		v.line(10, 10, 8, 8)
+		v.text(9, 13, strconv.Itoa(a2), 2)
+		v.numberLine("#faa", 8, 16, a2, advance)
 	}
 
 	// Second number, part one
@@ -69,40 +70,53 @@ func (v *HtmlView) Render() {
 		} else {
 			advance = a1
 		}
-		v.circle("#faa", 20, 17, 2)
-		v.line(20, 15, 22, 13)
-		v.text(19, 18, strconv.Itoa(b1), 2)
-		v.numberLine("#faa", 18, 21, b1, advance)
+		v.circle("#faa", 20, 12, 2)
+		v.line(20, 10, 22, 8)
+		v.text(19, 13, strconv.Itoa(b1), 2)
+		v.numberLine("#faa", 18, 16, b1, advance)
 	}
 
 	// Second number, part two
 	if b2 != 0 {
-		v.circle("#aaf", 26, 17, 2)
-		v.line(26, 15, 24, 13)
-		v.text(25, 18, strconv.Itoa(b2), 2)
-		v.numberLine("#aaf", 24, 21, b2, 0)
+		v.circle("#aaf", 26, 12, 2)
+		v.line(26, 10, 24, 8)
+		v.text(25, 13, strconv.Itoa(b2), 2)
+		v.numberLine("#aaf", 24, 16, b2, 0)
+	}
+
+	// Equals
+	v.line(29, 4, 32, 4)
+	v.line(29, 6, 32, 6)
+
+	// Choices
+	for i, c := range v.p.cs {
+		v.circle("white", 37, 6*i+4, 2)
+		t := v.text(36, 6*i+5, strconv.Itoa(c), 2)
+		t.Call("setAttribute", "id", fmt.Sprintf("answer-%v", i))
 	}
 }
 
-func (v *HtmlView) circle(color string, x, y, r int) {
+func (v *HtmlView) circle(color string, x, y, r int) js.Value {
 	c := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "circle")
 	c.Call("setAttribute", "cx", x)
 	c.Call("setAttribute", "cy", y)
 	c.Call("setAttribute", "r", r)
 	c.Call("setAttribute", "style", fmt.Sprintf("fill: %v; stroke: black; stroke-width: 0.25", color))
 	v.svg.Call("appendChild", c)
+	return c
 }
 
-func (v *HtmlView) text(x, y int, txt string, size int) {
+func (v *HtmlView) text(x, y int, txt string, size int) js.Value {
 	t := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "text")
 	t.Call("setAttribute", "x", x)
 	t.Call("setAttribute", "y", y)
 	t.Call("setAttribute", "style", fmt.Sprintf("font-size: %vpx", size))
 	t.Set("innerHTML", txt)
 	v.svg.Call("appendChild", t)
+	return t
 }
 
-func (v *HtmlView) line(x1, y1, x2, y2 int) {
+func (v *HtmlView) line(x1, y1, x2, y2 int) js.Value {
 	l := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "line")
 	l.Call("setAttribute", "x1", x1)
 	l.Call("setAttribute", "y1", y1)
@@ -110,6 +124,7 @@ func (v *HtmlView) line(x1, y1, x2, y2 int) {
 	l.Call("setAttribute", "y2", y2)
 	l.Call("setAttribute", "style", "stroke: black; stroke-width: 0.25")
 	v.svg.Call("appendChild", l)
+	return l
 }
 
 func (v *HtmlView) numberLine(color string, x, y, count, skip int) {
