@@ -11,6 +11,7 @@ type HtmlView struct {
 	doc       js.Value
 	svg       js.Value
 	done      func()
+	locked    bool
 	toRelease []js.Func
 }
 
@@ -109,7 +110,8 @@ func (v *HtmlView) Render() {
 }
 
 func (v *HtmlView) answer(c int) {
-	if c == v.p.c {
+	if c == v.p.c && !v.locked {
+		v.locked = true
 		v.done()
 		for _, fn := range v.toRelease {
 			fn.Release()
