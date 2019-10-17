@@ -12,6 +12,8 @@ const (
 	CORRECT   Event = "correct"
 	INCORRECT Event = "incorrect"
 	HINT      Event = "hint"
+
+	CLICKABLE = "#00b"
 )
 
 type HtmlView struct {
@@ -55,12 +57,12 @@ func (v *HtmlView) Render() {
 	v.release()
 
 	// First number
-	v.circle("white", 7, 5, 3)
-	v.text(5, 6, strconv.Itoa(v.p.a), 3)
+	v.circle("white", "black", 7, 5, 3)
+	v.text(5, 6, strconv.Itoa(v.p.a), 3, "black")
 
 	// Second number
-	v.circle("white", 23, 5, 3)
-	v.text(21, 6, strconv.Itoa(v.p.b), 3)
+	v.circle("white", "black", 23, 5, 3)
+	v.text(21, 6, strconv.Itoa(v.p.b), 3, "black")
 
 	// Operator
 	v.line(13, 5, 17, 5)
@@ -69,7 +71,7 @@ func (v *HtmlView) Render() {
 	}
 
 	if !v.hint {
-		h := v.text(14, 18, "?", 5)
+		h := v.text(14, 18, "?", 5, CLICKABLE)
 		h.Set("onclick", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			v.event(HINT)
 			return nil
@@ -80,9 +82,9 @@ func (v *HtmlView) Render() {
 
 		// First number, part one
 		if a1 != 0 {
-			v.circle("#afa", 4, 12, 2)
+			v.circle("#afa", "black", 4, 12, 2)
 			v.line(4, 10, 6, 8)
-			v.text(3, 13, strconv.Itoa(a1), 2)
+			v.text(3, 13, strconv.Itoa(a1), 2, "black")
 			v.numberLine("#afa", 2, 16, a1, 0)
 		}
 
@@ -92,9 +94,9 @@ func (v *HtmlView) Render() {
 			if v.p.op == minus {
 				advance = a1
 			}
-			v.circle("#faa", 10, 12, 2)
+			v.circle("#faa", "black", 10, 12, 2)
 			v.line(10, 10, 8, 8)
-			v.text(9, 13, strconv.Itoa(a2), 2)
+			v.text(9, 13, strconv.Itoa(a2), 2, "black")
 			v.numberLine("#faa", 8, 16, a2, advance)
 		}
 
@@ -106,17 +108,17 @@ func (v *HtmlView) Render() {
 			} else {
 				advance = a1
 			}
-			v.circle("#faa", 20, 12, 2)
+			v.circle("#faa", "black", 20, 12, 2)
 			v.line(20, 10, 22, 8)
-			v.text(19, 13, strconv.Itoa(b1), 2)
+			v.text(19, 13, strconv.Itoa(b1), 2, "black")
 			v.numberLine("#faa", 18, 16, b1, advance)
 		}
 
 		// Second number, part two
 		if b2 != 0 {
-			v.circle("#aaf", 26, 12, 2)
+			v.circle("#aaf", "black", 26, 12, 2)
 			v.line(26, 10, 24, 8)
-			v.text(25, 13, strconv.Itoa(b2), 2)
+			v.text(25, 13, strconv.Itoa(b2), 2, "black")
 			v.numberLine("#aaf", 24, 16, b2, 0)
 		}
 	}
@@ -133,16 +135,16 @@ func (v *HtmlView) Render() {
 			return nil
 		})
 		v.toRelease = append(v.toRelease, answer)
-		r := v.circle("white", 37, 6*i+4, 2)
+		r := v.circle("white", CLICKABLE, 37, 6*i+4, 2)
 		r.Set("onclick", answer)
-		t := v.text(36, 6*i+5, strconv.Itoa(c), 2)
+		t := v.text(36, 6*i+5, strconv.Itoa(c), 2, CLICKABLE)
 		t.Call("setAttribute", "id", fmt.Sprintf("answer-%v", i))
 		t.Set("onclick", answer)
 	}
 
 	// Score
-	v.text(43, 4, fmt.Sprintf("%v/%v", v.s.current, v.s.goal), 2)
-	v.text(43, 7, fmt.Sprintf("Wins: %v", v.s.wins), 2)
+	v.text(43, 4, fmt.Sprintf("%v/%v", v.s.current, v.s.goal), 2, "green")
+	v.text(43, 7, fmt.Sprintf("Wins: %v", v.s.wins), 2, "green")
 }
 
 func (v *HtmlView) release() {
@@ -160,21 +162,21 @@ func (v *HtmlView) answer(c int) {
 	}
 }
 
-func (v *HtmlView) circle(color string, x, y, r int) js.Value {
+func (v *HtmlView) circle(fill, stroke string, x, y, r int) js.Value {
 	c := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "circle")
 	c.Call("setAttribute", "cx", x)
 	c.Call("setAttribute", "cy", y)
 	c.Call("setAttribute", "r", r)
-	c.Call("setAttribute", "style", fmt.Sprintf("fill: %v; stroke: black; stroke-width: 0.25", color))
+	c.Call("setAttribute", "style", fmt.Sprintf("fill: %v; stroke: %v; stroke-width: 0.25", fill, stroke))
 	v.svg.Call("appendChild", c)
 	return c
 }
 
-func (v *HtmlView) text(x, y int, txt string, size int) js.Value {
+func (v *HtmlView) text(x, y int, txt string, size int, color string) js.Value {
 	t := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "text")
 	t.Call("setAttribute", "x", x)
 	t.Call("setAttribute", "y", y)
-	t.Call("setAttribute", "style", fmt.Sprintf("font-size: %vpx", size))
+	t.Call("setAttribute", "style", fmt.Sprintf("font-size: %vpx; fill: %v", size, color))
 	t.Set("innerHTML", txt)
 	v.svg.Call("appendChild", t)
 	return t
