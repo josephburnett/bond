@@ -153,6 +153,11 @@ func (v *HtmlView) Render() {
 	r.Call("setAttribute", "fill", "green")
 	v.svg.Call("appendChild", r)
 	v.text(45, 3+Y_OFFSET, fmt.Sprintf("Score: %v", v.s.wins), 1, "green")
+
+	// Celebrate!
+	if v.s.celebrate {
+		v.text(45, 8+Y_OFFSET, "+1", 5, "green")
+	}
 }
 
 func (v *HtmlView) release() {
