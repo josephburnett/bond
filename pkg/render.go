@@ -14,6 +14,8 @@ const (
 	HINT      Event = "hint"
 
 	CLICKABLE = "#00b"
+
+	Y_OFFSET = 2
 )
 
 type HtmlView struct {
@@ -57,21 +59,21 @@ func (v *HtmlView) Render() {
 	v.release()
 
 	// First number
-	v.circle("white", "black", 7, 5, 3)
-	v.text(5, 6, strconv.Itoa(v.p.a), 3, "black")
+	v.circle("white", "black", 7, 5+Y_OFFSET, 3)
+	v.text(5, 6+Y_OFFSET, strconv.Itoa(v.p.a), 3, "black")
 
 	// Second number
-	v.circle("white", "black", 23, 5, 3)
-	v.text(21, 6, strconv.Itoa(v.p.b), 3, "black")
+	v.circle("white", "black", 23, 5+Y_OFFSET, 3)
+	v.text(21, 6+Y_OFFSET, strconv.Itoa(v.p.b), 3, "black")
 
 	// Operator
-	v.line(13, 5, 17, 5)
+	v.line(13, 5+Y_OFFSET, 17, 5+Y_OFFSET)
 	if v.p.op == plus {
-		v.line(15, 7, 15, 3)
+		v.line(15, 7+Y_OFFSET, 15, 3+Y_OFFSET)
 	}
 
 	if !v.hint {
-		h := v.text(14, 18, "?", 5, CLICKABLE)
+		h := v.text(14, 18+Y_OFFSET, "?", 5, CLICKABLE)
 		h.Set("onclick", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			v.event(HINT)
 			return nil
@@ -82,10 +84,10 @@ func (v *HtmlView) Render() {
 
 		// First number, part one
 		if a1 != 0 {
-			v.circle("#afa", "black", 4, 12, 2)
-			v.line(4, 10, 6, 8)
-			v.text(3, 13, strconv.Itoa(a1), 2, "black")
-			v.numberLine("#afa", 2, 16, a1, 0)
+			v.circle("#afa", "black", 4, 12+Y_OFFSET, 2)
+			v.line(4, 10+Y_OFFSET, 6, 8+Y_OFFSET)
+			v.text(3, 13+Y_OFFSET, strconv.Itoa(a1), 2, "black")
+			v.numberLine("#afa", 2, 16+Y_OFFSET, a1, 0)
 		}
 
 		// First number, part two
@@ -94,10 +96,10 @@ func (v *HtmlView) Render() {
 			if v.p.op == minus {
 				advance = a1
 			}
-			v.circle("#faa", "black", 10, 12, 2)
-			v.line(10, 10, 8, 8)
-			v.text(9, 13, strconv.Itoa(a2), 2, "black")
-			v.numberLine("#faa", 8, 16, a2, advance)
+			v.circle("#faa", "black", 10, 12+Y_OFFSET, 2)
+			v.line(10, 10+Y_OFFSET, 8, 8+Y_OFFSET)
+			v.text(9, 13+Y_OFFSET, strconv.Itoa(a2), 2, "black")
+			v.numberLine("#faa", 8, 16+Y_OFFSET, a2, advance)
 		}
 
 		// Second number, part one
@@ -108,24 +110,24 @@ func (v *HtmlView) Render() {
 			} else {
 				advance = a1
 			}
-			v.circle("#faa", "black", 20, 12, 2)
-			v.line(20, 10, 22, 8)
-			v.text(19, 13, strconv.Itoa(b1), 2, "black")
-			v.numberLine("#faa", 18, 16, b1, advance)
+			v.circle("#faa", "black", 20, 12+Y_OFFSET, 2)
+			v.line(20, 10+Y_OFFSET, 22, 8+Y_OFFSET)
+			v.text(19, 13+Y_OFFSET, strconv.Itoa(b1), 2, "black")
+			v.numberLine("#faa", 18, 16+Y_OFFSET, b1, advance)
 		}
 
 		// Second number, part two
 		if b2 != 0 {
-			v.circle("#aaf", "black", 26, 12, 2)
-			v.line(26, 10, 24, 8)
-			v.text(25, 13, strconv.Itoa(b2), 2, "black")
-			v.numberLine("#aaf", 24, 16, b2, 0)
+			v.circle("#aaf", "black", 26, 12+Y_OFFSET, 2)
+			v.line(26, 10+Y_OFFSET, 24, 8+Y_OFFSET)
+			v.text(25, 13+Y_OFFSET, strconv.Itoa(b2), 2, "black")
+			v.numberLine("#aaf", 24, 16+Y_OFFSET, b2, 0)
 		}
 	}
 
 	// Equals
-	v.line(29, 4, 32, 4)
-	v.line(29, 6, 32, 6)
+	v.line(29, 4+Y_OFFSET, 32, 4+Y_OFFSET)
+	v.line(29, 6+Y_OFFSET, 32, 6+Y_OFFSET)
 
 	// Choices
 	for i, c := range v.p.cs {
@@ -135,16 +137,22 @@ func (v *HtmlView) Render() {
 			return nil
 		})
 		v.toRelease = append(v.toRelease, answer)
-		r := v.circle("white", CLICKABLE, 37, 6*i+4, 2)
+		r := v.circle("white", CLICKABLE, 37, 6*i+4+Y_OFFSET, 2)
 		r.Set("onclick", answer)
-		t := v.text(36, 6*i+5, strconv.Itoa(c), 2, CLICKABLE)
+		t := v.text(36, 6*i+5+Y_OFFSET, strconv.Itoa(c), 2, CLICKABLE)
 		t.Call("setAttribute", "id", fmt.Sprintf("answer-%v", i))
 		t.Set("onclick", answer)
 	}
 
 	// Score
-	v.text(43, 4, fmt.Sprintf("%v/%v", v.s.current, v.s.goal), 2, "green")
-	v.text(43, 7, fmt.Sprintf("Wins: %v", v.s.wins), 2, "green")
+	r := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "rect")
+	r.Call("setAttribute", "x", 0)
+	r.Call("setAttribute", "y", 0)
+	r.Call("setAttribute", "height", 1)
+	r.Call("setAttribute", "width", 1+int(float64(52)*(float64(v.s.current)/(float64(v.s.goal)))))
+	r.Call("setAttribute", "fill", "green")
+	v.svg.Call("appendChild", r)
+	v.text(45, 3+Y_OFFSET, fmt.Sprintf("Score: %v", v.s.wins), 1, "green")
 }
 
 func (v *HtmlView) release() {
