@@ -25,14 +25,28 @@ type Problem struct {
 func NewProblem() (p Problem) {
 	if rand.Intn(2) == 0 {
 		p.op = plus
-		p.a = rand.Intn(maxSum) + 1     // 1..20
-		p.b = rand.Intn(maxSum-p.a) + 1 // 1..(20-a)
-		p.c = p.a + p.b                 // 2..20
+		// a: 0..20
+		p.a = rand.Intn(maxSum + 1)
+		maxB := maxSum + 1 - p.a
+		// b: 0..(20-a)
+		if maxB == 0 {
+			p.b = 0
+		} else {
+			p.b = rand.Intn(maxB)
+		}
+		// c: 0..20
+		p.c = p.a + p.b
 	} else {
 		p.op = minus
-		p.a = rand.Intn(maxSum-2) + 2 // 2..20
-		p.b = rand.Intn(p.a-1) + 1    // 1..(a-1)
-		p.c = p.a - p.b               // 1..19
+		// a: 0..20
+		p.a = rand.Intn(maxSum + 1)
+		// b: 0..a
+		if p.a == 0 {
+			p.b = 0
+		} else {
+			p.b = rand.Intn(p.a + 1)
+		}
+		p.c = p.a - p.b // 0..20
 	}
 	cs := map[int]bool{p.c: true}
 	for len(cs) < choiceCount {
