@@ -19,4 +19,6 @@ Addition hints are a break down (number bond) of the two numbers to "fill in the
 
 Subtraction hints break down the first number into the part that is cancelled out by the second number, and the remainder.  A numberline is also shown.
 
+### Screenshot
+
 ![Addition Screenshot](resources/images/addition.png)
