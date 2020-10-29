@@ -5,18 +5,27 @@ import (
 	"math/rand"
 	"time"
 
-	bond "github.com/josephburnett/bond/pkg"
+	bond "github.com/josephburnett/bond/pkg/bond"
+	view "github.com/josephburnett/bond/pkg/view"
 )
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
+	params := bond.Parameters{
+		Max:         30,
+		ChoiceCount: 3,
+		Operators: []bond.Operator{
+			bond.Plus,
+			bond.Minus,
+		},
+	}
 	s := bond.NewScore()
-	var v *bond.HtmlView
+	var v *view.Html
 	eventHandler := func(e bond.Event) {
 		switch e {
 		case bond.CORRECT:
 			s.Correct()
-			v.SetProblem(bond.NewProblem())
+			v.SetProblem(params.NewProblem())
 			v.SetHint(false)
 			v.Render()
 		case bond.INCORRECT:
@@ -30,9 +39,9 @@ func main() {
 		}
 
 	}
-	v = bond.NewHtmlView(eventHandler)
+	v = view.NewHtml(eventHandler)
 	v.SetScore(s)
-	v.SetProblem(bond.NewProblem())
+	v.SetProblem(params.NewProblem())
 	v.Render()
 	select {}
 }

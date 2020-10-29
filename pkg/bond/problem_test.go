@@ -10,44 +10,44 @@ func TestBreakout(t *testing.T) {
 		p              Problem
 		a1, a2, b1, b2 int
 	}{{
-		p: Problem{a: 0, b: 0, op: plus},
+		p: Problem{A: 0, B: 0, Op: Plus},
 	}, {
-		p:  Problem{a: 3, b: 3, op: plus},
+		p:  Problem{A: 3, B: 3, Op: Plus},
 		a2: 3,
 		b1: 3,
 	}, {
-		p:  Problem{a: 10, b: 10, op: plus},
+		p:  Problem{A: 10, B: 10, Op: Plus},
 		a1: 10,
 		b1: 10,
 	}, {
-		p:  Problem{a: 11, b: 9, op: plus},
+		p:  Problem{A: 11, B: 9, Op: Plus},
 		a1: 10,
 		a2: 1,
 		b1: 9,
 	}, {
-		p:  Problem{a: 11, b: 10, op: plus},
+		p:  Problem{A: 11, B: 10, Op: Plus},
 		a1: 10,
 		a2: 1,
 		b1: 9,
 		b2: 1,
 	}, {
-		p:  Problem{a: 0, b: 1, op: plus},
+		p:  Problem{A: 0, B: 1, Op: Plus},
 		b1: 1,
 	}, {
-		p:  Problem{a: 10, b: 10, op: minus},
+		p:  Problem{A: 10, B: 10, Op: Minus},
 		a2: 10,
 		b1: 10,
 	}, {
-		p:  Problem{a: 5, b: 5, op: minus},
+		p:  Problem{A: 5, B: 5, Op: Minus},
 		a2: 5,
 		b1: 5,
 	}, {
-		p:  Problem{a: 10, b: 5, op: minus},
+		p:  Problem{A: 10, B: 5, Op: Minus},
 		a1: 5,
 		a2: 5,
 		b1: 5,
 	}, {
-		p:  Problem{a: 12, b: 2, op: minus},
+		p:  Problem{A: 12, B: 2, Op: Minus},
 		a1: 10,
 		a2: 2,
 		b1: 2,

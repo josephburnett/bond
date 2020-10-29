@@ -1,39 +1,34 @@
-package bond
+package view
 
 import (
 	"fmt"
 	"strconv"
 	"syscall/js"
-)
 
-type Event string
+	"github.com/josephburnett/bond/pkg/bond"
+)
 
 const (
-	CORRECT   Event = "correct"
-	INCORRECT Event = "incorrect"
-	HINT      Event = "hint"
-
 	CLICKABLE = "#00b"
-
-	Y_OFFSET = 2
+	Y_OFFSET  = 2
 )
 
-type HtmlView struct {
-	p         Problem
-	s         *Score
+type Html struct {
+	p         bond.Problem
+	s         *bond.Score
 	doc       js.Value
 	svg       js.Value
-	event     func(Event)
+	event     func(bond.Event)
 	toRelease []js.Func
 	hint      bool
 }
 
-func NewHtmlView(event func(Event)) *HtmlView {
+func NewHtml(event func(bond.Event)) *Html {
 	doc := js.Global().Get("document")
 	svg := doc.Call("getElementById", "bond")
 	svg.Call("setAttribute", "viewBox", "0 0 53 25")
 	svg.Set("innerHTML", "")
-	return &HtmlView{
+	return &Html{
 		doc:       doc,
 		svg:       svg,
 		event:     event,
@@ -41,41 +36,41 @@ func NewHtmlView(event func(Event)) *HtmlView {
 	}
 }
 
-func (v *HtmlView) SetProblem(p Problem) {
+func (v *Html) SetProblem(p bond.Problem) {
 	v.p = p
 }
 
-func (v *HtmlView) SetScore(s *Score) {
+func (v *Html) SetScore(s *bond.Score) {
 	v.s = s
 }
 
-func (v *HtmlView) SetHint(h bool) {
+func (v *Html) SetHint(h bool) {
 	v.hint = h
 }
 
-func (v *HtmlView) Render() {
+func (v *Html) Render() {
 
 	v.svg.Set("innerHTML", "")
 	v.release()
 
 	// First number
 	v.circle("white", "black", 7, 5+Y_OFFSET, 3)
-	v.text(5, 6+Y_OFFSET, strconv.Itoa(v.p.a), 3, "black")
+	v.text(5, 6+Y_OFFSET, strconv.Itoa(v.p.A), 3, "black")
 
 	// Second number
 	v.circle("white", "black", 23, 5+Y_OFFSET, 3)
-	v.text(21, 6+Y_OFFSET, strconv.Itoa(v.p.b), 3, "black")
+	v.text(21, 6+Y_OFFSET, strconv.Itoa(v.p.B), 3, "black")
 
 	// Operator
 	v.line(13, 5+Y_OFFSET, 17, 5+Y_OFFSET)
-	if v.p.op == plus {
+	if v.p.Op == bond.Plus {
 		v.line(15, 7+Y_OFFSET, 15, 3+Y_OFFSET)
 	}
 
 	if !v.hint {
 		h := v.text(14, 18+Y_OFFSET, "?", 5, CLICKABLE)
 		h.Set("onclick", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			v.event(HINT)
+			v.event(bond.HINT)
 			return nil
 		}))
 
@@ -93,7 +88,7 @@ func (v *HtmlView) Render() {
 		// First number, part two
 		if a2 != 0 {
 			advance := 0
-			if v.p.op == minus {
+			if v.p.Op == bond.Minus {
 				advance = a1
 			}
 			v.circle("#faa", "black", 10, 12+Y_OFFSET, 2)
@@ -105,7 +100,7 @@ func (v *HtmlView) Render() {
 		// Second number, part one
 		if b1 != 0 {
 			advance := 0
-			if v.p.op == plus {
+			if v.p.Op == bond.Plus {
 				advance = a2
 			} else {
 				advance = a1
@@ -130,7 +125,7 @@ func (v *HtmlView) Render() {
 	v.line(29, 6+Y_OFFSET, 32, 6+Y_OFFSET)
 
 	// Choices
-	for i, c := range v.p.cs {
+	for i, c := range v.p.Cs {
 		a := c
 		answer := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			v.answer(a)
@@ -149,33 +144,33 @@ func (v *HtmlView) Render() {
 	r.Call("setAttribute", "x", 0)
 	r.Call("setAttribute", "y", 0)
 	r.Call("setAttribute", "height", 1)
-	r.Call("setAttribute", "width", 1+int(float64(52)*(float64(v.s.current)/(float64(v.s.goal)))))
+	r.Call("setAttribute", "width", 1+int(float64(52)*(float64(v.s.Current)/(float64(v.s.Goal)))))
 	r.Call("setAttribute", "fill", "green")
 	v.svg.Call("appendChild", r)
-	v.text(45, 3+Y_OFFSET, fmt.Sprintf("Score: %v", v.s.wins), 1, "green")
+	v.text(45, 3+Y_OFFSET, fmt.Sprintf("Score: %v", v.s.Wins), 1, "green")
 
 	// Celebrate!
-	if v.s.celebrate {
+	if v.s.Celebrate {
 		v.text(45, 8+Y_OFFSET, "+1", 5, "green")
 	}
 }
 
-func (v *HtmlView) release() {
+func (v *Html) release() {
 	for _, fn := range v.toRelease {
 		fn.Release()
 	}
 	v.toRelease = make([]js.Func, 0)
 }
 
-func (v *HtmlView) answer(c int) {
-	if c == v.p.c {
-		v.event(CORRECT)
+func (v *Html) answer(c int) {
+	if c == v.p.C {
+		v.event(bond.CORRECT)
 	} else {
-		v.event(INCORRECT)
+		v.event(bond.INCORRECT)
 	}
 }
 
-func (v *HtmlView) circle(fill, stroke string, x, y, r int) js.Value {
+func (v *Html) circle(fill, stroke string, x, y, r int) js.Value {
 	c := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "circle")
 	c.Call("setAttribute", "cx", x)
 	c.Call("setAttribute", "cy", y)
@@ -185,7 +180,7 @@ func (v *HtmlView) circle(fill, stroke string, x, y, r int) js.Value {
 	return c
 }
 
-func (v *HtmlView) text(x, y int, txt string, size int, color string) js.Value {
+func (v *Html) text(x, y int, txt string, size int, color string) js.Value {
 	t := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "text")
 	t.Call("setAttribute", "x", x)
 	t.Call("setAttribute", "y", y)
@@ -195,7 +190,7 @@ func (v *HtmlView) text(x, y int, txt string, size int, color string) js.Value {
 	return t
 }
 
-func (v *HtmlView) line(x1, y1, x2, y2 int) js.Value {
+func (v *Html) line(x1, y1, x2, y2 int) js.Value {
 	l := v.doc.Call("createElementNS", "http://www.w3.org/2000/svg", "line")
 	l.Call("setAttribute", "x1", x1)
 	l.Call("setAttribute", "y1", y1)
@@ -206,7 +201,7 @@ func (v *HtmlView) line(x1, y1, x2, y2 int) js.Value {
 	return l
 }
 
-func (v *HtmlView) numberLine(color string, x, y, count, skip int) {
+func (v *Html) numberLine(color string, x, y, count, skip int) {
 	row, col := 0, 0
 	advance := func() {
 		col += 1
