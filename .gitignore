@@ -13,3 +13,4 @@
 
 # Compiled artifacts
 resources/wasm/bond.wasm
+resources/wasm/wasm_exec.js
