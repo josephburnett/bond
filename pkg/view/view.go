@@ -62,9 +62,17 @@ func (v *Html) Render() {
 	v.text(21, 6+Y_OFFSET, strconv.Itoa(v.p.B), 3, "black")
 
 	// Operator
-	v.line(13, 5+Y_OFFSET, 17, 5+Y_OFFSET)
-	if v.p.Op == bond.Plus {
-		v.line(15, 7+Y_OFFSET, 15, 3+Y_OFFSET)
+	switch v.p.Op {
+	case bond.Minus:
+		v.line(13, 5+Y_OFFSET, 17, 5+Y_OFFSET)
+	case bond.Plus:
+		v.line(13, 5+Y_OFFSET, 17, 5+Y_OFFSET)
+		if v.p.Op == bond.Plus {
+			v.line(15, 7+Y_OFFSET, 15, 3+Y_OFFSET)
+		}
+	case bond.Times:
+		v.line(14, 6+Y_OFFSET, 16, 4+Y_OFFSET)
+		v.line(16, 6+Y_OFFSET, 14, 4+Y_OFFSET)
 	}
 
 	if !v.hint {
@@ -134,7 +142,11 @@ func (v *Html) Render() {
 		v.toRelease = append(v.toRelease, answer)
 		r := v.circle("white", CLICKABLE, 37, 6*i+4+Y_OFFSET, 2)
 		r.Set("onclick", answer)
-		t := v.text(36, 6*i+5+Y_OFFSET, strconv.Itoa(c), 2, CLICKABLE)
+		size := 2
+		if c > 99 {
+			size = 1
+		}
+		t := v.text(36, 6*i+5+Y_OFFSET, strconv.Itoa(c), size, CLICKABLE)
 		t.Call("setAttribute", "id", fmt.Sprintf("answer-%v", i))
 		t.Set("onclick", answer)
 	}

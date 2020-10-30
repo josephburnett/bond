@@ -17,6 +17,7 @@ func main() {
 		Operators: []bond.Operator{
 			bond.Plus,
 			bond.Minus,
+			bond.Times,
 		},
 	}
 	s := bond.NewScore()
