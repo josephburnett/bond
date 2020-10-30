@@ -12,7 +12,7 @@ import (
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	params := bond.Parameters{
-		Max:         30,
+		Max:         20,
 		MaxTimes:    12,
 		ChoiceCount: 5,
 		Operators: []bond.Operator{
