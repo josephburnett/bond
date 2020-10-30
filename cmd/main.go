@@ -14,10 +14,8 @@ func main() {
 	params := bond.Parameters{
 		Max:         20,
 		MaxTimes:    12,
-		ChoiceCount: 5,
+		ChoiceCount: 4,
 		Operators: []bond.Operator{
-			bond.Plus,
-			bond.Minus,
 			bond.Times,
 		},
 	}
