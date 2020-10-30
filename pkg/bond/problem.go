@@ -7,9 +7,10 @@ import (
 type Operator string
 
 const (
-	Plus  Operator = "plus"
-	Minus          = "minus"
-	Times          = "times"
+	Plus   Operator = "plus"
+	Minus           = "minus"
+	Times           = "times"
+	Divide          = "divide"
 )
 
 type Parameters struct {
@@ -26,23 +27,25 @@ type Problem struct {
 
 func (param *Parameters) NewProblem() (p Problem) {
 	op := param.Operators[rand.Intn(len(param.Operators))]
+	maxC := 0
 	switch op {
 	case Plus:
 		p.Op = Plus
-		// a: 0..20
+		// a: 0..Max
 		p.A = rand.Intn(param.Max + 1)
 		maxB := param.Max + 1 - p.A
-		// b: 0..(20-a)
+		// b: 0..(Max-a)
 		if maxB == 0 {
 			p.B = 0
 		} else {
 			p.B = rand.Intn(maxB)
 		}
-		// c: 0..20
+		// c: 0..2*Max
+		maxC = 2 * param.Max
 		p.C = p.A + p.B
 	case Minus:
 		p.Op = Minus
-		// a: 0..20
+		// a: 0..Max
 		p.A = rand.Intn(param.Max + 1)
 		// b: 0..A
 		if p.A == 0 {
@@ -50,11 +53,22 @@ func (param *Parameters) NewProblem() (p Problem) {
 		} else {
 			p.B = rand.Intn(p.A + 1)
 		}
-		p.C = p.A - p.B // 0..20
+		// c: 0..Max
+		maxC = param.Max
+		p.C = p.A - p.B
+	case Times:
+		p.Op = Times
+		// a: 0..Max
+		p.A = rand.Intn(param.Max + 1)
+		// b: 0..Max
+		p.B = rand.Intn(param.Max + 1)
+		// c: 0..Max^2
+		maxC = param.Max * param.Max
+		p.C = p.A * p.B
 	}
 	cs := map[int]bool{p.C: true}
 	for len(cs) < param.ChoiceCount {
-		c := rand.Intn(param.Max) + 1 // 1..20
+		c := rand.Intn(maxC) + 1
 		if _, ok := cs[c]; !ok {
 			cs[c] = true
 		}
@@ -96,4 +110,13 @@ func (p Problem) Breakout() (a1, a2, b1, b2 int) {
 	}
 	// No breakout for times.
 	return
+}
+
+func (p Problem) Groups() [][2]int {
+	// TODO: real groups
+	return [][2]int{{
+		5, 10,
+	}, {
+		2, 2,
+	}}
 }

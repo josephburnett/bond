@@ -5,6 +5,59 @@ import (
 	"testing"
 )
 
+func TestNewProblemFuzz(t *testing.T) {
+	params := &Parameters{
+		Max:         30,
+		ChoiceCount: 3,
+		Operators: []Operator{
+			Plus,
+			Minus,
+			Times,
+		},
+	}
+	for i := 0; i < 1000; i++ {
+		p := params.NewProblem()
+		if p.A > params.Max {
+			t.Errorf("Wanted max A %v. Got %v", params.Max, p.A)
+		}
+		if p.B > params.Max {
+			t.Errorf("Wanted max B %v. Got %v", params.Max, p.B)
+		}
+		if len(p.Cs) != params.ChoiceCount {
+			t.Errorf("Wanted %v choices. Got %v", params.ChoiceCount, len(p.Cs))
+		}
+		if p.A < 0 || p.B < 0 || p.C < 0 {
+			t.Errorf("Wanted non-negative A, B and C. Got %v, %v and %v", p.A, p.B, p.C)
+		}
+		switch p.Op {
+		case Plus:
+			if p.A+p.B != p.C {
+				t.Errorf("Wanted a+b=c. Got %v+%v=%v", p.A, p.B, p.C)
+			}
+			maxC := params.Max + params.Max
+			if p.C > maxC {
+				t.Errorf("Wanted max C %v. Got %v", maxC, p.C)
+			}
+		case Minus:
+			if p.A-p.B != p.C {
+				t.Errorf("Wanted a-b=c. Got %v-%v=%v", p.A, p.B, p.C)
+			}
+			if p.C > params.Max {
+				t.Errorf("Wanted max C %v. Got %v", params.Max, p.C)
+			}
+		case Times:
+			if p.A*p.B != p.C {
+				t.Errorf("Wanted a*b=c. Got %v*%v=%v", p.A, p.B, p.C)
+			}
+			maxC := params.Max * params.Max
+			if p.C > maxC {
+				t.Errorf("Wanted max C %v. Got %v", maxC, p.C)
+			}
+		}
+
+	}
+}
+
 func TestBreakout(t *testing.T) {
 	cases := []struct {
 		p              Problem
