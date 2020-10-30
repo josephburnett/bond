@@ -75,14 +75,14 @@ func (v *Html) Render() {
 		v.line(16, 6+Y_OFFSET, 14, 4+Y_OFFSET)
 	}
 
-	if !v.hint {
+	switch {
+	case !v.hint:
 		h := v.text(14, 18+Y_OFFSET, "?", 5, CLICKABLE)
 		h.Set("onclick", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			v.event(bond.HINT)
 			return nil
 		}))
-
-	} else {
+	case v.p.Op == bond.Plus, v.p.Op == bond.Minus:
 		a1, a2, b1, b2 := v.p.Breakout()
 
 		// First number, part one
@@ -90,7 +90,7 @@ func (v *Html) Render() {
 			v.circle("#afa", "black", 4, 12+Y_OFFSET, 2)
 			v.line(4, 10+Y_OFFSET, 6, 8+Y_OFFSET)
 			v.text(3, 13+Y_OFFSET, strconv.Itoa(a1), 2, "black")
-			v.numberLine("#afa", 2, 16+Y_OFFSET, a1, 0)
+			v.numberLine("#afa", 2, 16+Y_OFFSET, a1, 0, 5)
 		}
 
 		// First number, part two
@@ -102,7 +102,7 @@ func (v *Html) Render() {
 			v.circle("#faa", "black", 10, 12+Y_OFFSET, 2)
 			v.line(10, 10+Y_OFFSET, 8, 8+Y_OFFSET)
 			v.text(9, 13+Y_OFFSET, strconv.Itoa(a2), 2, "black")
-			v.numberLine("#faa", 8, 16+Y_OFFSET, a2, advance)
+			v.numberLine("#faa", 8, 16+Y_OFFSET, a2, advance, 5)
 		}
 
 		// Second number, part one
@@ -116,7 +116,7 @@ func (v *Html) Render() {
 			v.circle("#faa", "black", 20, 12+Y_OFFSET, 2)
 			v.line(20, 10+Y_OFFSET, 22, 8+Y_OFFSET)
 			v.text(19, 13+Y_OFFSET, strconv.Itoa(b1), 2, "black")
-			v.numberLine("#faa", 18, 16+Y_OFFSET, b1, advance)
+			v.numberLine("#faa", 18, 16+Y_OFFSET, b1, advance, 5)
 		}
 
 		// Second number, part two
@@ -124,7 +124,23 @@ func (v *Html) Render() {
 			v.circle("#aaf", "black", 26, 12+Y_OFFSET, 2)
 			v.line(26, 10+Y_OFFSET, 24, 8+Y_OFFSET)
 			v.text(25, 13+Y_OFFSET, strconv.Itoa(b2), 2, "black")
-			v.numberLine("#aaf", 24, 16+Y_OFFSET, b2, 0)
+			v.numberLine("#aaf", 24, 16+Y_OFFSET, b2, 0, 5)
+		}
+	case v.p.Op == bond.Times:
+		colors := []string{
+			"#afa",
+			"#faa",
+			"#aaf",
+		}
+		groups := v.p.Groups()
+		for i, g := range groups {
+			color := colors[i%3]
+			for k := 0; k < g[0]; k++ {
+				x := 4 + i*13
+				y := 12 + Y_OFFSET + k*2
+				v.numberLine(color, x, y, g[1], 0, 10)
+			}
+
 		}
 	}
 
@@ -213,11 +229,11 @@ func (v *Html) line(x1, y1, x2, y2 int) js.Value {
 	return l
 }
 
-func (v *Html) numberLine(color string, x, y, count, skip int) {
+func (v *Html) numberLine(color string, x, y, count, skip int, maxCol int) {
 	row, col := 0, 0
 	advance := func() {
 		col += 1
-		if col == 5 {
+		if col == maxCol {
 			col = 0
 			row += 1
 		}
