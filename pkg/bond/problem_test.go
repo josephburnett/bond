@@ -8,6 +8,7 @@ import (
 func TestNewProblemFuzz(t *testing.T) {
 	params := &Parameters{
 		Max:         30,
+		MaxTimes:    12,
 		ChoiceCount: 3,
 		Operators: []Operator{
 			Plus,
@@ -104,6 +105,11 @@ func TestBreakout(t *testing.T) {
 		a1: 10,
 		a2: 2,
 		b1: 2,
+	}, {
+		p:  Problem{A: 27, B: 0, Op: Plus},
+		a1: 10,
+		a2: 17,
+		b1: 0,
 	}}
 
 	for _, c := range cases {

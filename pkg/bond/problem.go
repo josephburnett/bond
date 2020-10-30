@@ -89,19 +89,27 @@ func (p Problem) Breakout() (a1, a2, b1, b2 int) {
 	case Plus:
 		switch {
 		case p.A < 10:
+			// Less than 10 remains whole.
 			a2 = p.A
 			a1 = 0
 		default:
+			// Greater than 10 splits off 10.
 			a1 = 10
 			a2 = p.A - 10
 		}
 		switch {
 		case a2+p.B <= 10:
+			// Second part of A plus B is less than 10. Leave whole.
 			b1 = p.B
 			b2 = 0
 		default:
+			// Second part of A plus B is more than 10. Split off 10.
 			b1 = 10 - a2
 			b2 = p.B - b1
+		}
+		// Hack
+		if b1 < 0 {
+			b1, b2 = 0, 0
 		}
 	case Minus:
 		a1 = p.A - p.B
