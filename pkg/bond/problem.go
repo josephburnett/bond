@@ -15,6 +15,7 @@ const (
 
 type Parameters struct {
 	Max         int
+	MaxTimes    int
 	ChoiceCount int
 	Operators   []Operator
 }
@@ -59,11 +60,11 @@ func (param *Parameters) NewProblem() (p Problem) {
 	case Times:
 		p.Op = Times
 		// a: 0..Max
-		p.A = rand.Intn(param.Max + 1)
+		p.A = rand.Intn(param.MaxTimes + 1)
 		// b: 0..Max
-		p.B = rand.Intn(param.Max + 1)
+		p.B = rand.Intn(param.MaxTimes + 1)
 		// c: 0..Max^2
-		maxC = param.Max * param.Max
+		maxC = param.MaxTimes * param.MaxTimes
 		p.C = p.A * p.B
 	}
 	cs := map[int]bool{p.C: true}
@@ -113,10 +114,33 @@ func (p Problem) Breakout() (a1, a2, b1, b2 int) {
 }
 
 func (p Problem) Groups() [][2]int {
-	// TODO: real groups
-	return [][2]int{{
-		5, 10,
-	}, {
-		2, 2,
-	}}
+	bigger, smaller := p.A, p.B
+	if bigger < smaller {
+		bigger, smaller = smaller, bigger
+	}
+	groups := [][2]int{}
+	add := func(count, size int) {
+		for i := 0; i < count; i++ {
+			groups = append(groups, [2]int{smaller, size})
+		}
+	}
+	tens := bigger / 10
+	if tens > 0 {
+		add(tens, 10)
+	}
+	remainder := bigger - tens*10
+	fives := remainder / 5
+	if fives > 0 {
+		add(fives, 5)
+	}
+	remainder = remainder - fives*5
+	twos := remainder / 2
+	if twos > 0 {
+		add(twos, 2)
+	}
+	remainder = remainder - twos*2
+	if remainder > 0 {
+		add(remainder, 1)
+	}
+	return groups
 }

@@ -26,7 +26,7 @@ type Html struct {
 func NewHtml(event func(bond.Event)) *Html {
 	doc := js.Global().Get("document")
 	svg := doc.Call("getElementById", "bond")
-	svg.Call("setAttribute", "viewBox", "0 0 53 25")
+	svg.Call("setAttribute", "viewBox", "0 0 53 40")
 	svg.Set("innerHTML", "")
 	return &Html{
 		doc:       doc,

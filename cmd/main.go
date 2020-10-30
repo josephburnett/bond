@@ -13,6 +13,7 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	params := bond.Parameters{
 		Max:         30,
+		MaxTimes:    12,
 		ChoiceCount: 3,
 		Operators: []bond.Operator{
 			bond.Plus,
