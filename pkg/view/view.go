@@ -127,20 +127,25 @@ func (v *Html) Render() {
 			v.numberLine("#aaf", 24, 16+Y_OFFSET, b2, 0, 5)
 		}
 	case v.p.Op == bond.Times:
-		colors := []string{
-			"#afa",
-			"#faa",
-			"#aaf",
+		colors := map[int]string{
+			10: "#afa",
+			5:  "#faa",
+			2:  "#aaf",
+			1:  "#fff",
 		}
 		groups := v.p.Groups()
-		for i, g := range groups {
-			color := colors[i%3]
+		offset := 0
+		for _, g := range groups {
+			color := "#fff"
+			if c, ok := colors[g[1]]; ok {
+				color = c
+			}
 			for k := 0; k < g[0]; k++ {
-				x := 4 + i*13
+				x := 4 + offset
 				y := 12 + Y_OFFSET + k*2
 				v.numberLine(color, x, y, g[1], 0, 10)
 			}
-
+			offset += g[1] + 2
 		}
 	}
 
