@@ -1,7 +1,7 @@
 # bond
 Practice adding and subtracting with number bonds.
 
-Demo: **[math.nixy.io/bond](http://math.nixy.io/bond/wasm_exec.html)**
+Demo: **[math.nixy.io/bond](http://math.nixy.io/bond)**
 
 ## Gameplay
 
